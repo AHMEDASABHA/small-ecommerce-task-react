@@ -2,13 +2,23 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, Button, FloatingLabel } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 // Define the validation schema using Zod
 const schema = z
   .object({
-    firstName: z.string().min(3, "FirstName is required"),
+    firstName: z
+      .string()
+      .min(3, "FirstName is required")
+      .regex(/^[a-zA-Z]+$/),
     lastName: z.string().optional(),
-    email: z.string().email("Invalid email address"),
+    email: z
+      .string()
+      .email("Invalid email address")
+      .regex(
+        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+        "Invalid email address"
+      ),
     phone: z
       .string()
       .transform((data) => Number(data))
@@ -16,8 +26,20 @@ const schema = z
         message: "Phone number must be a number",
       }),
     username: z.string().min(3, "Username is required"),
-    password: z.string().min(6, "Password must be at least 6 characters long"),
-    confirmPassword: z.string().min(6),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters long")
+      .regex(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/,
+        "Please Enter a password with a SC, Number, a number of characters between 8-32"
+      ),
+    confirmPassword: z
+      .string()
+      .min(6)
+      .regex(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/,
+        "Please Enter a password with a SC, Number, a number of characters between 8-32"
+      ),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
@@ -30,6 +52,7 @@ const schema = z
   });
 
 function RegisterForm() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -39,7 +62,11 @@ function RegisterForm() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ email: data.email, password: data.password })
+    );
+    navigate("/");
   };
 
   return (
@@ -54,7 +81,7 @@ function RegisterForm() {
             type="text"
             placeholder="Enter first name"
             {...register("firstName")}
-            isInvalid={!!errors.firstName}
+            isInvalid={errors.firstName != null}
           />
           <Form.Control.Feedback type="invalid">
             {errors.firstName?.message}
@@ -82,7 +109,7 @@ function RegisterForm() {
             type="text"
             placeholder="Enter username"
             {...register("username")}
-            isInvalid={!!errors.username}
+            isInvalid={errors.username != null}
           />
           <Form.Control.Feedback type="invalid">
             {errors.username?.message}
@@ -98,7 +125,7 @@ function RegisterForm() {
             type="email"
             placeholder="Enter email"
             {...register("email")}
-            isInvalid={!!errors.email}
+            isInvalid={errors.email != null}
           />
           <Form.Control.Feedback type="invalid">
             {errors.email?.message}
@@ -114,7 +141,7 @@ function RegisterForm() {
             type="text"
             placeholder="Enter phone number"
             {...register("phone")}
-            isInvalid={!!errors.phone}
+            isInvalid={errors.phone != null}
           />
           <Form.Control.Feedback type="invalid">
             {errors.phone?.message}
@@ -130,7 +157,7 @@ function RegisterForm() {
             type="password"
             placeholder="Password"
             {...register("password")}
-            isInvalid={!!errors.password}
+            isInvalid={errors.password != null}
           />
           <Form.Control.Feedback type="invalid">
             {errors.password?.message}
@@ -146,7 +173,7 @@ function RegisterForm() {
             type="password"
             placeholder="Confirm password"
             {...register("confirmPassword")}
-            isInvalid={!!errors.confirmPassword}
+            isInvalid={errors.confirmPassword != null}
           />
           <Form.Control.Feedback type="invalid">
             {errors.confirmPassword?.message}
