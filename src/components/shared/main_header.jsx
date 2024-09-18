@@ -9,8 +9,7 @@ export const MainHeader = () => {
       <Container>
         <Nav>
           <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
-          <Nav.Link>Features</Nav.Link>
-          <Nav.Link>Pricing</Nav.Link>
+          <Nav.Link onClick={() => navigate("/products")}>Products</Nav.Link>
         </Nav>
         <Nav>
           <Nav.Link onClick={() => navigate("/login")}>Login</Nav.Link>
